@@ -1,0 +1,4 @@
+
+
+
+gcc *.c -o 1.o -levent -lrt -lpthread
