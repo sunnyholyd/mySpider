@@ -13,11 +13,16 @@
 #define RECV_SIZE 8050
 
 
+void initSocket();
 void makeRequestAndReceive(struct url *adr);
 void makeHttpRequest(int sock,short event,void *arg);
 void revHttpResponse(int sock,short event,void *arg);
 
 struct event_base* base;
+
+void initSocket(){
+
+}
 
 void makeRequestAndReceive(struct url *adr){
 	printf("makeRequestAndReceive\n");
@@ -30,7 +35,7 @@ void makeRequestAndReceive(struct url *adr){
 		return ;
 	}
 
-	// flags=fcntl(sockfd,F_GETFL);
+	//flags=fcntl(sockfd,F_GETFL);
 	//flags|=O_NONBLOCK;
 	//fcntl(sockfd,F_SETFL,O_NONBLOCK);
 
@@ -44,7 +49,6 @@ void makeRequestAndReceive(struct url *adr){
 		close(sockfd);
 		return ;
 	}
-	printf("test\n");
 	struct event send_ev;
 
 	base=event_base_new();
@@ -77,12 +81,14 @@ void makeHttpRequest(int sock,short event,void *arg){
 	//sprintf(req, "%sContent-Type: application/x-www-form-urlencoded\r\n",req);
 	sprintf(req, "%sConnection:Close\r\n", req);
 	sprintf(req, "%s\r\n%d",req,(int)strlen(req)); 		
-	puts(req);
+	// puts(req);
 	if(send(sock,req,(int)strlen(req),0)==-1){
 		printf("send error!");
 		close(sock);
 		return ;
 	}
+
+	printf("Http request success!\n");
 
 	struct event rev_ev;
 
@@ -96,6 +102,7 @@ void makeHttpRequest(int sock,short event,void *arg){
 	
 }
 void revHttpResponse(int sock,short event,void *arg){
+	printf("rev Http response\n");
 
 	char buf[RECV_SIZE];
 	int buflen,i=0;
@@ -106,7 +113,7 @@ void revHttpResponse(int sock,short event,void *arg){
 			printf("get the attr_html failed!\n");
 		}
 		if(attr_html.mq_curmsgs>=5){
-			printf("l\n");
+			printf("attr_html.mq_curmsgs>=5 so close receive.\n");
 			close(sock);
 			return ;
 		}
@@ -131,6 +138,7 @@ void revHttpResponse(int sock,short event,void *arg){
 		}
 
 	}
+	printf("recv done!\n");
 	close(sock);
 
 	if(buflen<0){
@@ -148,7 +156,6 @@ void* asyncCrawling(void * arg){
 	while(1){
 		//sleep(2);
 		char* buf;
-		printf("asd\n");
 		buf=recv_url();
 		//puts(buf);
 		

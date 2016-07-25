@@ -141,7 +141,7 @@ void* Analysis(void* arg)
 {
 	while(1){
 		memset(mylink,'\0',1024);
-		printf("AnalySis begin\n");
+		
 		char *code;
 		code = recv_html();
 		
@@ -150,6 +150,8 @@ void* Analysis(void* arg)
 			printf("code NULL");
 			continue;
 		}
+		printf("AnalySis codes:\n");
+		puts(code);
 		
 		stateMachine *mymachine;
 		mymachine = &s[0];
@@ -163,7 +165,7 @@ void* Analysis(void* arg)
 			CheckMachineState(mymachine, code[i]);
 			mymachine = Step(mymachine, code[i]);
 		}
-		puts(code);
+		
 
 		if(code!=NULL){
 			free(code);
